@@ -1,0 +1,291 @@
+/* Base styles */
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background: linear-gradient(to bottom, #f9f9f9, #e6e6e6);
+  color: #333;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Stronger dark mode override for toggling */
+body.dark-mode {
+  background: radial-gradient(circle at top left, #0f0f23, #000000 80%) !important;
+  color: #eee !important;
+}
+
+body.dark-mode textarea,
+body.dark-mode select,
+body.dark-mode button {
+  background-color: #1e1e1e !important;
+  color: #eee !important;
+  border: 1px solid #555 !important;
+}
+
+/* Inputs and buttons */
+textarea,
+select,
+button {
+  font-family: monospace;
+  padding: 10px;
+  font-size: 1rem;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+  max-width: 500px;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+  transition: 0.2s;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.6);
+}
+
+/* Button toolbar */
+.button-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  max-width: 500px;
+}
+
+/* Responsive layout for tabs */
+@media screen and (min-width: 768px) {
+  .tab-content {
+    display: block;
+  }
+
+  .button-toolbar {
+    max-width: none;
+  }
+}
+
+/* Tab navigation */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  position: sticky;
+  top: 0;
+  background-color: inherit;
+  padding: 10px 0;
+  z-index: 999;
+}
+
+.tab-button {
+  padding: 10px 16px;
+  font-weight: bold;
+  border: 1px solid #666;
+  background-color: transparent;
+  color: inherit;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.tab-button.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+/* Lint results */
+.lint-results {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 15px;
+  max-width: 500px;
+}
+
+.lint-results li {
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  background-color: #eee;
+}
+
+.lint-results .warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border-left: 5px solid #ffc107;
+}
+
+.lint-results .info {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border-left: 5px solid #17a2b8;
+}
+
+body.dark-mode .lint-results li {
+  background-color: #2c2c2c !important;
+}
+
+body.dark-mode .lint-results .warning {
+  background-color: #665c00 !important;
+  color: #fff1b0 !important;
+  border-left-color: #ffd700 !important;
+}
+
+body.dark-mode .lint-results .info {
+  background-color: #003f4f !important;
+  color: #bce4ec !important;
+  border-left-color: #00bcd4 !important;
+}
+
+/* Responsive styles for mobile devices */
+@media screen and (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+
+  textarea,
+  select,
+  button {
+    font-size: 0.95rem;
+    padding: 8px;
+  }
+
+  #dark-mode-toggle {
+    top: 8px;
+    right: 8px;
+    font-size: 0.8rem;
+    padding: 5px 10px;
+  }
+
+  .lint-results li {
+    font-size: 0.9rem;
+    padding: 6px 10px;
+  }
+}
+
+/* Splash Screen */
+#splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #121212;
+  color: #00ffcc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 9999;
+  transition: opacity 1s ease-out;
+}
+
+#splash-screen.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.splash-content {
+  text-align: center;
+  animation: pulse-glow 1.5s infinite ease-in-out;
+}
+
+.splash-logo {
+  font-size: 4rem;
+  margin-bottom: 10px;
+}
+
+.splash-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.splash-loading {
+  font-size: 1rem;
+  font-style: italic;
+}
+
+/* Branding Bar */
+.branding-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #202020;
+  color: white;
+  padding: 10px 20px;
+  border-bottom: 2px solid #00bcd4;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  animation: slideDownFade 0.8s ease-out;
+  box-shadow: 0 2px 5px rgba(0, 188, 212, 0.3);
+}
+
+/* Branding bar hover glow effect */
+.branding-bar:hover {
+  box-shadow: 0 0 10px #00bcd4, 0 0 20px #00bcd4;
+}
+
+.brand-left {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.brand-right button {
+  background-color: transparent;
+  border: 1px solid #00bcd4;
+  color: #00bcd4;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.brand-right button:hover {
+  background-color: #00bcd4;
+  color: #121212;
+  transition: 0.2s;
+}
+
+/* Branding bar animation */
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Splash screen animation */
+@keyframes pulse-glow {
+  0%, 100% {
+    text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc;
+  }
+  50% {
+    text-shadow: 0 0 5px #00bcd4, 0 0 10px #00bcd4;
+  }
+}
+
+/* New styling for code input and output columns */
+.code-input-column,
+.code-output-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Optional max-width for large screens */
+.code-input-column textarea,
+.code-output-column .lint-results {
+  width: 100%;
+}

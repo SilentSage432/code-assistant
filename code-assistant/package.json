@@ -1,0 +1,32 @@
+{
+  "name": "code-assistant",
+  "displayName": "Code Assistant",
+  "description": "An intelligent code assistant built by Silent Sage",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.98.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onCommand:code-assistant.openPanel"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "code-assistant.openPanel",
+        "title": "Code Assistant: Open Panel"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc",
+    "watch": "tsc -w"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "@types/vscode": "^1.98.0"
+  }
+}

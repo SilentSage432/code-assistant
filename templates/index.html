@@ -1,0 +1,249 @@
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Code Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='alien.png') }}">
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div id="splash-screen">
+      <div class="splash-content">
+        <div class="splash-logo">👽</div>
+        <div class="splash-title">Code Assistant</div>
+        <div class="splash-loading">Booting neural lint core...</div>
+      </div>
+    </div>
+    <button id="dark-mode-toggle">🌙 Toggle Dark Mode</button>
+    <h1>Code Assistant</h1>
+
+    <div class="tabs">
+        <button class="tab-button active" data-tab="python-tab">🐍 Python</button>
+        <button class="tab-button" data-tab="html-tab">🌐 HTML</button>
+        <button class="tab-button" data-tab="js-tab">⚙️ JavaScript</button>
+        <button class="tab-button" data-tab="history-tab">📜 History</button>
+    </div>
+
+    <div id="python-tab" class="tab-content">
+        <div class="grid-wrapper">
+            <div class="code-output-column">
+                <div class="button-toolbar">
+                    <button onclick="analyzeCode()">Analyze</button>
+                    <button onclick="copyToClipboard('code-input')">📋 Copy Code</button>
+                    <button onclick="downloadCode('code-input', 'python')">💾 Download Code</button>
+                </div>
+                <ul id="result-list" class="lint-results"></ul>
+            </div>
+            <div class="code-input-column">
+                <textarea id="code-input" placeholder="Paste your Python code here"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div id="html-tab" class="tab-content" style="display:none;">
+        <div class="grid-wrapper">
+            <div class="code-output-column">
+                <div class="button-toolbar">
+                    <button onclick="analyzeHTML()">Analyze</button>
+                    <button onclick="copyToClipboard('html-code-input')">📋 Copy Code</button>
+                    <button onclick="downloadCode('html-code-input', 'html')">💾 Download Code</button>
+                </div>
+                <ul id="html-result-list" class="lint-results"></ul>
+                <iframe id="html-preview" sandbox="allow-scripts" style="width: 100%; height: 300px; border: 1px solid #ccc; margin-top: 1rem;"></iframe>
+            </div>
+            <div class="code-input-column">
+                <textarea id="html-code-input" placeholder="Paste your HTML/CSS here"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div id="js-tab" class="tab-content" style="display:none;">
+        <div class="grid-wrapper">
+            <div class="code-output-column">
+                <div class="button-toolbar">
+                    <button onclick="analyzeJS()">Analyze</button>
+                    <button onclick="copyToClipboard('js-code-input')">📋 Copy Code</button>
+                    <button onclick="downloadCode('js-code-input', 'javascript')">💾 Download Code</button>
+                </div>
+                <ul id="js-result-list" class="lint-results"></ul>
+            </div>
+            <div class="code-input-column">
+                <textarea id="js-code-input" placeholder="Paste your JavaScript here"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div id="history-tab" class="tab-content" style="display:none;">
+        <button onclick="clearHistory()">🗑️ Clear History</button>
+        <div id="history-entries">
+            <p>No history yet...</p>
+        </div>
+    </div>
+
+    <script>
+        // Toggle dark mode
+        document.getElementById('dark-mode-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+
+        // Tab switching logic
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+
+                button.classList.add('active');
+                document.getElementById(button.getAttribute('data-tab')).style.display = 'block';
+            });
+        });
+
+        // Analyze Python code
+        async function analyzeCode() {
+            const code = document.getElementById('code-input').value;
+            const lang = document.getElementById('lang-select').value;
+            const response = await fetch('/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code, language: lang })
+            });
+            const data = await response.json();
+            const resultList = document.getElementById('result-list');
+            resultList.innerHTML = ''; // Clear previous
+
+            const lines = data.feedback.split('\n');
+            lines.forEach(line => {
+                if (line.trim() !== '') {
+                    const item = document.createElement('li');
+                    item.textContent = line;
+                    item.className = line.toLowerCase().includes('missing') ? 'warning' : 'info';
+                    resultList.appendChild(item);
+                }
+            });
+            saveToHistory(code, lang, data.feedback);
+        }
+
+        // Analyze HTML code
+        async function analyzeHTML() {
+            const code = document.getElementById('html-code-input').value;
+            const response = await fetch('/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code, language: 'html' })
+            });
+            const data = await response.json();
+            const resultList = document.getElementById('html-result-list');
+            resultList.innerHTML = '';
+
+            const lines = data.feedback.split('\n');
+            lines.forEach(line => {
+                if (line.trim() !== '') {
+                    const item = document.createElement('li');
+                    item.textContent = line;
+                    item.className = line.toLowerCase().includes('⚠️') ? 'warning' : 'info';
+                    resultList.appendChild(item);
+                }
+            });
+            saveToHistory(code, 'html', data.feedback);
+        }
+
+        // Analyze JavaScript code
+        async function analyzeJS() {
+            const code = document.getElementById('js-code-input').value;
+            const response = await fetch('/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code, language: 'javascript' })
+            });
+            const data = await response.json();
+            const resultList = document.getElementById('js-result-list');
+            resultList.innerHTML = '';
+
+            const lines = data.feedback.split('\n');
+            lines.forEach(line => {
+                if (line.trim() !== '') {
+                    const item = document.createElement('li');
+                    item.textContent = line;
+                    item.className = line.toLowerCase().includes('⚠️') ? 'warning' : 'info';
+                    resultList.appendChild(item);
+                }
+            });
+            saveToHistory(code, 'javascript', data.feedback);
+        }
+
+        function saveToHistory(code, language, feedback) {
+            const history = JSON.parse(localStorage.getItem('codeHistory') || '[]');
+            history.unshift({
+                timestamp: new Date().toLocaleString(),
+                language,
+                code,
+                feedback
+            });
+            localStorage.setItem('codeHistory', JSON.stringify(history));
+            displayHistory();
+        }
+
+        function displayHistory() {
+            const historyContainer = document.getElementById('history-entries');
+            const history = JSON.parse(localStorage.getItem('codeHistory') || '[]');
+
+            if (history.length === 0) {
+                historyContainer.innerHTML = '<p>No history yet...</p>';
+                return;
+            }
+
+            const list = document.createElement('ul');
+            list.className = 'lint-results';
+
+            history.forEach(entry => {
+                const item = document.createElement('li');
+                item.innerHTML = `<strong>${entry.language.toUpperCase()}</strong> (${entry.timestamp})<br><code>${entry.code}</code><br><em>${entry.feedback}</em>`;
+                list.appendChild(item);
+            });
+
+            historyContainer.innerHTML = '';
+            historyContainer.appendChild(list);
+        }
+
+        function clearHistory() {
+            localStorage.removeItem('codeHistory');
+            displayHistory();
+        }
+
+        function copyToClipboard(id) {
+            const textarea = document.getElementById(id);
+            textarea.select();
+            document.execCommand('copy');
+            alert('Code copied to clipboard!');
+        }
+
+        function downloadCode(id, language) {
+            const textarea = document.getElementById(id);
+            const blob = new Blob([textarea.value], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `code_assistant_${language}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // Live HTML Preview
+        document.getElementById('html-code-input').addEventListener('input', () => {
+            const previewFrame = document.getElementById('html-preview');
+            const doc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+            doc.open();
+            doc.write(document.getElementById('html-code-input').value);
+            doc.close();
+        });
+
+        displayHistory();
+
+        window.addEventListener('DOMContentLoaded', () => {
+          setTimeout(() => {
+            const splash = document.getElementById('splash-screen');
+            splash.classList.add('fade-out');
+            setTimeout(() => splash.style.display = 'none', 1000);
+          }, 4000);
+        });
+    </script>
+</body>
